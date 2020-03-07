@@ -39,7 +39,7 @@ open class SwiftLinkPreview: NSObject {
     public let responseQueue: DispatchQueue
     public let cache: Cache
     
-    public let timeout: TimeInterval = 10
+    public var timeout: TimeInterval = 10
 
     public static let defaultWorkQueue = DispatchQueue.global(qos: .userInitiated)
 
