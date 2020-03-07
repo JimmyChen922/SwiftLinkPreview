@@ -23,7 +23,7 @@ public enum SwiftLinkResponseKey: String {
 open class Cancellable: NSObject {
     public private(set) var isCancelled: Bool = false
 
-    @objc open func cancel() {
+    @objc public func cancel() {
         isCancelled = true
     }
 }
@@ -39,7 +39,7 @@ open class SwiftLinkPreview: NSObject {
     public let responseQueue: DispatchQueue
     public let cache: Cache
     
-    public let timeout: TimeInterval
+    public let timeout: TimeInterval = 10
 
     public static let defaultWorkQueue = DispatchQueue.global(qos: .userInitiated)
 
