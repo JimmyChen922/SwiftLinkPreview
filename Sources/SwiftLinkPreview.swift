@@ -23,7 +23,7 @@ public enum SwiftLinkResponseKey: String {
 open class Cancellable: NSObject {
     public private(set) var isCancelled: Bool = false
 
-    open func cancel() {
+    @objc open func cancel() {
         isCancelled = true
     }
 }
@@ -38,6 +38,8 @@ open class SwiftLinkPreview: NSObject {
     public let workQueue: DispatchQueue
     public let responseQueue: DispatchQueue
     public let cache: Cache
+    
+    public let timeout: TimeInterval
 
     public static let defaultWorkQueue = DispatchQueue.global(qos: .userInitiated)
 
@@ -65,7 +67,7 @@ open class SwiftLinkPreview: NSObject {
     }
 
     //Objective-C init with paramaters.  nil objects will default.  Timeout values are ignored if InMemoryCache is disabled.
-    @objc public init(session: URLSession?, workQueue: DispatchQueue?, responseQueue: DispatchQueue?, disableInMemoryCache: Bool, cacheInvalidationTimeout: TimeInterval, cacheCleanupInterval: TimeInterval) {
+    @objc public init(session: URLSession?, workQueue: DispatchQueue?, responseQueue: DispatchQueue?, disableInMemoryCache: Bool, cacheInvalidationTimeout: TimeInterval, cacheCleanupInterval: TimeInterval, requestTimeout: TimeInterval) {
 
         let _session = session ?? URLSession.shared
         let _workQueue = workQueue ?? SwiftLinkPreview.defaultWorkQueue
@@ -76,7 +78,7 @@ open class SwiftLinkPreview: NSObject {
         self.responseQueue = _responseQueue
         self.cache = _cache
         self.session = _session
-
+        self.timeout = requestTimeout;
     }
 
     // MARK: - Functions
@@ -250,6 +252,7 @@ extension SwiftLinkPreview {
         var task: URLSessionDataTask?
         var request = URLRequest(url: url)
         request.httpMethod = "HEAD"
+        request.timeoutInterval = self.timeout;
 
         task = session.dataTask(with: request, completionHandler: { data, response, error in
             if error != nil {
