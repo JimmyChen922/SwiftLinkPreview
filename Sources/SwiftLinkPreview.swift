@@ -335,6 +335,7 @@ extension SwiftLinkPreview {
             }
             var request = URLRequest( url: sourceUrl )
             request.addValue("text/html,application/xhtml+xml,application/xml", forHTTPHeaderField: "Accept")
+            request.timeoutInterval = self.timeout;
             let (data, urlResponse, error) = session.synchronousDataTask(with: request )
             if let error = error {
                 if !cancellable.isCancelled {
@@ -351,13 +352,14 @@ extension SwiftLinkPreview {
                 }
             } else {
                 do {
-                    let data = try Data(contentsOf: sourceUrl)
-                    var source: NSString? = nil
-                    NSString.stringEncoding(for: data, encodingOptions: nil, convertedString: &source, usedLossyConversion: nil)
-
-                    if let source = source {
-                        if !cancellable.isCancelled {
+                     if !cancellable.isCancelled{
+                        let data = try Data(contentsOf: sourceUrl)
+                        var source: NSString? = nil
+                        NSString.stringEncoding(for: data, encodingOptions: nil, convertedString: &source, usedLossyConversion: nil)
+                        if let source = source{
                             self.parseHtmlString(source as String, response: response, completion: completion)
+                        } else {
+                            onError(.cannotBeOpened(sourceUrl.absoluteString))
                         }
                     } else {
                         onError(.cannotBeOpened(sourceUrl.absoluteString))
